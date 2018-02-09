@@ -84,9 +84,17 @@ print R
 for x in xrange(1000):
     R = np.dot(R,G)
 
-evolution = [np.dot(PI,G**i) for i in  xrange(1,20)]
+evolution = []
+for i in xrange(20):
+    PI = np.dot(PI, G)
+    evolution.append(PI)
+#print evolution
 plt.figure()
 for i in xrange(N):
-    plt.plot([step[0,i] for step in evolution], label=fnames[i], lw=2)
+    plt.plot([step[i] for step in evolution], label=fnames[i], lw=2)
 plt.draw()
+plt.xlabel('iterations')
+plt.ylabel('rank')
+plt.legend()
+plt.show()
 print R
