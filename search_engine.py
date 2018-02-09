@@ -64,9 +64,7 @@ for pred, succ in DG.adj.iteritems():
     for s, edata in succ.iteritems():
         T[f2i[pred], f2i[s]] =  edata['weight']
 
-#print "T---"
 #print T
-
 epsilon = 0.01
 
 E = np.ones(T.shape)
@@ -74,12 +72,21 @@ E = E/N
 E = epsilon * E
 
 L = T+E
-#print "L---"
-#print L
 G = L.copy()
-
 S = np.sum(L, axis=1)
 S = S.reshape(-1,1)
 G = G/S
-#print "G---"
-#print G
+
+R = np.random.random(N)
+R = R/np.sum(R)
+PI = R.copy()
+print R
+for x in xrange(1000):
+    R = np.dot(R,G)
+
+evolution = [np.dot(PI,G**i) for i in  xrange(1,20)]
+plt.figure()
+for i in xrange(N):
+    plt.plot([step[0,i] for step in evolution], label=fnames[i], lw=2)
+plt.draw()
+print R
