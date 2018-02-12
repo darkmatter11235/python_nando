@@ -96,5 +96,35 @@ plt.draw()
 plt.xlabel('iterations')
 plt.ylabel('rank')
 plt.legend()
-plt.show()
-print R
+#plt.show()
+
+def getPageRank(key):
+    '''
+    returns the rank of the page given a key
+    Rank of the page is the final entry in the G matrix
+    '''
+    return R[f2i[key]]
+
+#create a reverse index based on words in a file
+#it is a dictionary that has words as keys, and values as a list of fname,count
+#tuples
+rIndex = {}
+for fname in fnames:
+    filepath = os.path.join(dirpath,"pages",fname)
+    links[filename] = []
+    f = open(filepath)
+    for line in f.readlines():
+        corpus = line.split()
+        for word in corpus:
+            if word in rIndex:
+                if fname in rIndex[word]:
+                    rIndex[word][fname] += 1
+                else:
+                    rIndex[word][fname] = 1
+            else:
+                rIndex[word] = {fname: 1}
+ 
+#print rIndex
+search_key = "film"
+result = rIndex[search_key].keys()
+print sorted(result, key=getPageRank, reverse=True)
