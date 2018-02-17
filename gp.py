@@ -17,7 +17,7 @@ Xtest = np.linspace(-5,5,n).reshape(-1,1)
 #print Xtest.shape
 #print np.sum(Xtest**2,1).reshape(-1,1)
 
-params = [0.1, 1, 2]
+params = [1, 1.5, 2]
 fig = plt.figure()
 index = 0
 num_rows = len(params)
