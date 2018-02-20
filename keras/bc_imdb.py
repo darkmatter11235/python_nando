@@ -1,3 +1,6 @@
+# Example for binary classification using keras 
+# and IMDB sentiment analysis dataset
+
 import numpy as np
 from keras.datasets import imdb
 from keras import models

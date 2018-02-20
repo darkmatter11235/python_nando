@@ -1,3 +1,6 @@
+# Example for multi-class classification using keras 
+# and IMDB sentiment analysis dataset
+
 from keras import models
 from keras import layers
 from keras import optimizers
