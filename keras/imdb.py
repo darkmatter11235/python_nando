@@ -33,17 +33,22 @@ x_test = vectorized_sequences(test_data, num_words)
 y_train = np.asarray(train_labels).astype('float32')
 y_test = np.asarray(test_lables).astype('float32')
 
-h1_dim = 16
-h2_dim = 16
+h1_dim = 64
+h2_dim = 128
+h3_dim = 128
+h4_dim = 128
 out_dim = 1
 
 model = models.Sequential()
 model.add(layers.Dense(h1_dim, activation='relu', input_shape=(num_words, )))
 model.add(layers.Dense(h2_dim, activation='relu'))
+model.add(layers.Dense(h3_dim, activation='relu'))
+model.add(layers.Dense(h4_dim, activation='relu'))
 model.add(layers.Dense(out_dim, activation='sigmoid'))
 
 model.compile(optimizer=optimizers.RMSprop(lr=0.001),
-              loss=losses.binary_crossentropy,
+              #loss=losses.binary_crossentropy,
+              loss=losses.mse,
               metrics=[metrics.binary_accuracy])
 
 x_val = x_train[:10000]
@@ -71,6 +76,6 @@ plt.legend()
 plt.show()
 
 
-prediction = model.predict(x_test)
+#prediction = model.predict(x_test)
 
-print prediction
+#print prediction
