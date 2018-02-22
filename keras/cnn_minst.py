@@ -41,6 +41,7 @@ network.compile(optimizer='rmsprop',
 n_epochs = 5
 b_size = 128
 
+print network.summary()
 print 'Training the network'
 network.fit(train_images, train_labels, epochs=n_epochs, batch_size=b_size)
 
