@@ -38,19 +38,22 @@ def load_data(path="data/cora/", dataset="cora", prefix=""):
         idx_features_labels = np.genfromtxt("{}{}/{}_device_index.txt".format(path, dataset,prefix), dtype=np.float32)
         features = sp.csr_matrix(idx_features_labels[:,2:-1], dtype=np.float32)
         labels = encode_onehot(idx_features_labels[:,2]+idx_features_labels[:,3]+idx_features_labels[:,4])
-        print(labels[1:100])
-        edges_data = np.genfromtxt("{}{}.cites".format(path, dataset), dtype=np.int32)
+        ## build graph
+        idx = np.array(idx_features_labels[:, 1], dtype=np.int32)
+        idx_map = {j: i for i, j in enumerate(idx)}
+        #print(labels[1:100])
+        #print(idx_map)
+        edges_data = np.genfromtxt("{}{}/{}_graph.txt".format(path, dataset, prefix), dtype=np.int32)
         edges_unordered = edges_data[:,[0,-1]]
-        edges = np.array(list(map(idx_map.get, edges_unordered.flatten())),
-                         dtype=np.int32).reshape(edges_unordered.shape)
-        adj = sp.coo_matrix((np.ones(edges.shape[0]), (edges[:, 0], edges[:, 1])),
-                            shape=(labels.shape[0], labels.shape[0]), dtype=np.float32)
+        edge_map = map(idx_map.get, edges_unordered.flatten())
+        print(edge_map)
+        edges = np.array(list(map(idx_map.get, edges_unordered.flatten())),dtype=np.int32).reshape(edges_unordered.shape)
+        adj = sp.coo_matrix((np.ones(edges.shape[0]), (edges[:, 0], edges[:, 1])),shape=(labels.shape[0], labels.shape[0]), dtype=np.float32)
+                            
 
         # build symmetric adjacency matrix
         adj = adj + adj.T.multiply(adj.T > adj) - adj.multiply(adj.T > adj)
-        asdfa
-
-        
+        print(adj[:10])
 
     print('Dataset has {} nodes, {} edges, {} features.'.format(adj.shape[0], edges.shape[0], features.shape[1]))
     return features.todense(), adj, labels
@@ -78,10 +81,15 @@ def sample_mask(idx, l):
     return np.array(mask, dtype=np.bool)
 
 
-def get_splits(y):
-    idx_train = range(140)
-    idx_val = range(200, 500)
-    idx_test = range(500, 1500)
+def get_splits(y, dataset=""):
+    if dataset != "":
+        idx_train = range(100)
+        idx_val = range(101, 200)
+        idx_test = range(201, 290)
+    else:
+        idx_train = range(140)
+        idx_val = range(200, 500)
+        idx_test = range(500, 1500)
     y_train = np.zeros(y.shape, dtype=np.int32)
     y_val = np.zeros(y.shape, dtype=np.int32)
     y_test = np.zeros(y.shape, dtype=np.int32)

@@ -27,7 +27,7 @@ def main():
 
     # Get data
     X, A, y = load_data(path=PATH,dataset=DATASET, prefix=PREFIX)
-    y_train, y_val, y_test, idx_train, idx_val, idx_test, train_mask = get_splits(y)
+    y_train, y_val, y_test, idx_train, idx_val, idx_test, train_mask = get_splits(y,DATASET)
 
     pdb.set_trace()
     # Normalize X
