@@ -12,28 +12,47 @@ def encode_onehot(labels):
     return labels_onehot
 
 
-def load_data(path="data/cora/", dataset="cora"):
+def load_data(path="data/cora/", dataset="cora", prefix=""):
+    
     """Load citation network dataset (cora only for now)"""
     print('Loading {} dataset...'.format(dataset))
+    if dataset == "cora":
 
-    idx_features_labels = np.genfromtxt("{}{}.content".format(path, dataset), dtype=np.dtype(str))
-    features = sp.csr_matrix(idx_features_labels[:, 1:-1], dtype=np.float32)
-    labels = encode_onehot(idx_features_labels[:, -1])
+        idx_features_labels = np.genfromtxt("{}{}.content".format(path, dataset), dtype=np.dtype(str))
+        features = sp.csr_matrix(idx_features_labels[:, 1:-1], dtype=np.float32)
+        labels = encode_onehot(idx_features_labels[:, -1])
 
-    # build graph
-    idx = np.array(idx_features_labels[:, 0], dtype=np.int32)
-    idx_map = {j: i for i, j in enumerate(idx)}
-    edges_unordered = np.genfromtxt("{}{}.cites".format(path, dataset), dtype=np.int32)
-    edges = np.array(list(map(idx_map.get, edges_unordered.flatten())),
-                     dtype=np.int32).reshape(edges_unordered.shape)
-    adj = sp.coo_matrix((np.ones(edges.shape[0]), (edges[:, 0], edges[:, 1])),
-                        shape=(labels.shape[0], labels.shape[0]), dtype=np.float32)
+        # build graph
+        idx = np.array(idx_features_labels[:, 0], dtype=np.int32)
+        idx_map = {j: i for i, j in enumerate(idx)}
+        edges_unordered = np.genfromtxt("{}{}.cites".format(path, dataset), dtype=np.int32)
+        edges = np.array(list(map(idx_map.get, edges_unordered.flatten())),
+                         dtype=np.int32).reshape(edges_unordered.shape)
+        adj = sp.coo_matrix((np.ones(edges.shape[0]), (edges[:, 0], edges[:, 1])),
+                            shape=(labels.shape[0], labels.shape[0]), dtype=np.float32)
 
-    # build symmetric adjacency matrix
-    adj = adj + adj.T.multiply(adj.T > adj) - adj.multiply(adj.T > adj)
+        # build symmetric adjacency matrix
+        adj = adj + adj.T.multiply(adj.T > adj) - adj.multiply(adj.T > adj)
+
+    elif dataset == "sch2graph":
+        idx_features_labels = np.genfromtxt("{}{}/{}_device_index.txt".format(path, dataset,prefix), dtype=np.float32)
+        features = sp.csr_matrix(idx_features_labels[:,2:-1], dtype=np.float32)
+        labels = encode_onehot(idx_features_labels[:,2]+idx_features_labels[:,3]+idx_features_labels[:,4])
+        print(labels[1:100])
+        edges_data = np.genfromtxt("{}{}.cites".format(path, dataset), dtype=np.int32)
+        edges_unordered = edges_data[:,[0,-1]]
+        edges = np.array(list(map(idx_map.get, edges_unordered.flatten())),
+                         dtype=np.int32).reshape(edges_unordered.shape)
+        adj = sp.coo_matrix((np.ones(edges.shape[0]), (edges[:, 0], edges[:, 1])),
+                            shape=(labels.shape[0], labels.shape[0]), dtype=np.float32)
+
+        # build symmetric adjacency matrix
+        adj = adj + adj.T.multiply(adj.T > adj) - adj.multiply(adj.T > adj)
+        asdfa
+
+        
 
     print('Dataset has {} nodes, {} edges, {} features.'.format(adj.shape[0], edges.shape[0], features.shape[1]))
-
     return features.todense(), adj, labels
 
 

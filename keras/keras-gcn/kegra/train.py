@@ -5,8 +5,10 @@ from keras.models import Model
 from keras.optimizers import Adam
 from keras.regularizers import l2
 
-from kegra.layers.graph import GraphConvolution
-from kegra.utils import *
+#from kegra.layers.graph import GraphConvolution
+from layers.graph import GraphConvolution
+#from kegra.utils import *
+from utils import *
 
 import time
 import pdb
@@ -14,6 +16,9 @@ import pdb
 def main():
     # Define parameters
     DATASET = 'cora'
+    DATASET = 'sch2graph'
+    PATH = 'data/'
+    PREFIX = 'dly_cell'
     FILTER = 'localpool'  # 'chebyshev'
     MAX_DEGREE = 2  # maximum polynomial degree
     SYM_NORM = True  # symmetric (True) vs. left-only (False) normalization
@@ -21,7 +26,7 @@ def main():
     PATIENCE = 10  # early stopping patience
 
     # Get data
-    X, A, y = load_data(dataset=DATASET)
+    X, A, y = load_data(path=PATH,dataset=DATASET, prefix=PREFIX)
     y_train, y_val, y_test, idx_train, idx_val, idx_test, train_mask = get_splits(y)
 
     pdb.set_trace()
