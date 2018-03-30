@@ -29,16 +29,16 @@ def dump_checkpoints():
 def main():
  
     # Define parameters
-    DATASET = 'sch2graph'
     DATASET = 'cora'
+    DATASET = 'sch2graph'
     if DATASET == 'sch2graph':
         PATH = 'data/'
         PREFIX = 'dly_cell'
     else:
         DATASET = 'cora'
         PATH = 'data/cora/'
+        PREFIX = ''
     FILTER = 'localpool'  # 'chebyshev'
-    PREFIX = ''
     MAX_DEGREE = 2  # maximum polynomial degree
     SYM_NORM = True  # symmetric (True) vs. left-only (False) normalization
     NB_EPOCH = 200
@@ -52,7 +52,7 @@ def main():
     K.set_session(sess)
     # Get data
     X, A, y = load_data(path=PATH,dataset=DATASET, prefix=PREFIX)
-    y_train, y_val, y_test, idx_train, idx_val, idx_test, train_mask = get_splits(y,"")
+    y_train, y_val, y_test, idx_train, idx_val, idx_test, train_mask = get_splits(y,DATASET)
 
     #pdb.set_trace()
     # Normalize X

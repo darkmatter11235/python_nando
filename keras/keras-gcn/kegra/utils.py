@@ -82,14 +82,17 @@ def sample_mask(idx, l):
 
 
 def get_splits(y, dataset=""):
-    if dataset != "":
+    if dataset == 'sch2graph':
         idx_train = range(100)
         idx_val = range(101, 200)
         idx_test = range(201, 290)
-    else:
+    elif dataset == 'cora':
         idx_train = range(140)
         idx_val = range(200, 500)
         idx_test = range(500, 1500)
+    else:
+        print('Unable to load splits with missing required argument dataset')
+        return
     y_train = np.zeros(y.shape, dtype=np.int32)
     y_val = np.zeros(y.shape, dtype=np.int32)
     y_test = np.zeros(y.shape, dtype=np.int32)
