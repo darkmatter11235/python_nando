@@ -1,5 +1,7 @@
 import keras.backend as K
-
+import scipy.sparse as sp
+import numpy as np
+import pdb
 
 def get_activations(model, model_inputs, print_shape_only=False, layer_name=None):
     print('----- activations -----')
@@ -25,10 +27,10 @@ def get_activations(model, model_inputs, print_shape_only=False, layer_name=None
     funcs = []
     index = 0
     for out in outputs:
-        print(model.layers[index].name)
+        print( "processing outputs for layer {}".format(model.layers[index].name))
         index += 1
         print(out.shape)
-        funcs.append(K.function(inp, [out]))
+        funcs.append(K.function(inp + [K.learning_phase()], [out]))
     #funcs = [K.function(inp, [out]) for out in outputs]  # evaluation functions
 
     if model_multi_inputs_cond:
@@ -38,9 +40,31 @@ def get_activations(model, model_inputs, print_shape_only=False, layer_name=None
     else:
         list_inputs = [model_inputs, 0.]
 
+    #list_inputs[1] = K.sparse_to_dense(list_inputs[1].indices, list_inputs[1].dense_shape, list_inputs[1].values)
+    list_inputs[1] = list_inputs[1].todense().astype(np.float32)
     # Learning phase. 0 = Test mode (no dropout or batch normalization)
     # layer_outputs = [func([model_inputs, 0.])[0] for func in funcs]
-    layer_outputs = [func(list_inputs)[0] for func in funcs]
+    index = 0
+    layer_outputs = []
+    print(list_inputs)
+    for func in funcs:
+        layer_name = model.layers[index].name
+        print(model.layers[index].name)
+        index += 1
+        #print len(list_inputs)
+        print(func)
+        #layer_outputs.append(func(list_inputs)[0])
+        #layer_outputs.append(func([list_inputs[0], list_inputs[1]]))
+        if layer_name == 'input_2' or layer_name == 'dropout_1':
+            layer_outputs.append(func([list_inputs[0]])[0])
+        elif layer_name == 'input_1':
+            print("Skipping input_1")
+            #pass
+            #layer_outputs.append(func([list_inputs[0],list_inputs[1]]))
+        else:
+            layer_outputs.append(func([list_inputs[0], list_inputs[1]])[0])
+
+    #layer_outputs = [func(list_inputs)[0] for func in funcs]
     for layer_activations in layer_outputs:
         activations.append(layer_activations)
         if print_shape_only:
@@ -64,11 +88,16 @@ def display_activations(activation_maps):
     (1, 10)
     """
     batch_size = activation_maps[0].shape[0]
-    assert batch_size == 1, 'One image at a time to visualize.'
+    #pdb.set_trace()
+    print(batch_size)
+    #assert batch_size == 1, 'One image at a time to visualize.'
     for i, activation_map in enumerate(activation_maps):
         print('Displaying activation map {}'.format(i))
         shape = activation_map.shape
-        if len(shape) == 4:
+        activations = activation_map
+        if True:
+            print("")
+        elif len(shape) == 4:
             activations = np.hstack(np.transpose(activation_map[0], (2, 0, 1)))
         elif len(shape) == 2:
             # try to make it square as much as possible. we can skip some activations.

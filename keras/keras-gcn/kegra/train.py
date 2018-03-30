@@ -65,7 +65,8 @@ def main(debug=False, dataset='sch2graph'):
         A_ = preprocess_adj(A, SYM_NORM)
         support = 1
         graph = [X, A_]
-        G = [Input(shape=(None, None), batch_shape=(None, None), sparse=True)]
+        #G = [Input(shape=(None, None), batch_shape=(None, None), sparse=True)]
+        G = [Input(shape=(None, None), batch_shape=(None, None), sparse=False)]
 
     elif FILTER == 'chebyshev':
         """ Chebyshev polynomial basis filters (Defferard et al., NIPS 2016)  """
@@ -114,6 +115,7 @@ def main(debug=False, dataset='sch2graph'):
         # Predict on full dataset
         preds = model.predict(graph, batch_size=A.shape[0])
 
+        print(preds)
         # Train / validation scores
         train_val_loss, train_val_acc = evaluate_preds(preds, [y_train, y_val],
                                                        [idx_train, idx_val])
@@ -126,8 +128,8 @@ def main(debug=False, dataset='sch2graph'):
         #print(len(graph))
         #X = graph[0]
         #print(X.shape)
-        #a = get_activations(model, graph, print_shape_only=True)  # with just one sample.
-        #display_activations(a)
+        a = get_activations(model, graph, print_shape_only=False)  # with just one sample.
+        display_activations(a)
 
 
         # Early stopping
