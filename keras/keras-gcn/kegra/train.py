@@ -47,7 +47,7 @@ def main():
     from tensorflow.python import debug as tf_debug
     import keras.backend as K
     debug = False
-    debug = True
+    #debug = True
     if debug:
         sess = K.get_session()
         sess = tf_debug.LocalCLIDebugWrapperSession(sess)
