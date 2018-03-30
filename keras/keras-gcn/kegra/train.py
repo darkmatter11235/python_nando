@@ -12,8 +12,13 @@ from layers.graph import GraphConvolution
 from utils import *
 from read_activations import get_activations, display_activations
 
+
 import time
 import pdb
+import argparse
+
+from tensorflow.python import debug as tf_debug
+import keras.backend as K
 
 def dump_checkpoints():
     # Change starts here
@@ -26,11 +31,10 @@ def dump_checkpoints():
         pass
     os.mkdir('checkpoints')
                                                                                                                            
-def main():
+def main(debug=False, dataset='sch2graph'):
  
     # Define parameters
-    DATASET = 'cora'
-    DATASET = 'sch2graph'
+    DATASET = dataset
     if DATASET == 'sch2graph':
         PATH = 'data/'
         PREFIX = 'dly_cell'
@@ -42,12 +46,8 @@ def main():
     MAX_DEGREE = 2  # maximum polynomial degree
     SYM_NORM = True  # symmetric (True) vs. left-only (False) normalization
     NB_EPOCH = 200
-    PATIENCE = 100  # early stopping patience
+    PATIENCE = 20  # early stopping patience
 
-    from tensorflow.python import debug as tf_debug
-    import keras.backend as K
-    debug = False
-    #debug = True
     if debug:
         sess = K.get_session()
         sess = tf_debug.LocalCLIDebugWrapperSession(sess)
@@ -99,8 +99,8 @@ def main():
     preds = None
     best_val_loss = 99999
 
-    dump_checkpoints()
-    checkpoint = ModelCheckpoint(monitor='val_acc', filepath='checkpoints/model_gcn.txt',save_best_only=False) 
+    #dump_checkpoints()
+    #checkpoint = ModelCheckpoint(monitor='val_acc', filepath='checkpoints/model_gcn.txt',save_best_only=False) 
     # Fit
     for epoch in range(1, NB_EPOCH+1):
 
@@ -147,4 +147,10 @@ def main():
           "accuracy= {:.4f}".format(test_acc[0]))
 
 if __name__ == '__main__':
-    main()
+    ap = argparse.ArgumentParser()
+    ap.add_argument("-i", "--dataset", type=str, default='sch2graph', help="Dataset string ('cora', 'sch2graph')")
+    ap.add_argument("-d", "--debug", type=bool, default=False, help="launch tfdbg")
+    args = vars(ap.parse_args())
+    DATASET = args['dataset']
+    DEBUG = args['debug']
+    main(debug=DEBUG, dataset=DATASET)
