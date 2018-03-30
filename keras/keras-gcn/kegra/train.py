@@ -4,32 +4,57 @@ from keras.layers import Input, Dropout
 from keras.models import Model
 from keras.optimizers import Adam
 from keras.regularizers import l2
+from keras.callbacks import ModelCheckpoint
 
 #from kegra.layers.graph import GraphConvolution
 from layers.graph import GraphConvolution
 #from kegra.utils import *
 from utils import *
+from read_activations import get_activations, display_activations
 
 import time
 import pdb
 
+def dump_checkpoints():
+    # Change starts here
+    import shutil
+    import os
+    # delete folder and its content and creates a new one.
+    try:
+        shutil.rmtree('checkpoints')
+    except:
+        pass
+    os.mkdir('checkpoints')
+                                                                                                                           
 def main():
+ 
     # Define parameters
-    DATASET = 'cora'
     DATASET = 'sch2graph'
-    PATH = 'data/'
-    PREFIX = 'dly_cell'
+    DATASET = 'cora'
+    if DATASET == 'sch2graph':
+        PATH = 'data/'
+        PREFIX = 'dly_cell'
+    else:
+        DATASET = 'cora'
+        PATH = 'data/cora/'
     FILTER = 'localpool'  # 'chebyshev'
+    PREFIX = ''
     MAX_DEGREE = 2  # maximum polynomial degree
     SYM_NORM = True  # symmetric (True) vs. left-only (False) normalization
     NB_EPOCH = 200
-    PATIENCE = 10  # early stopping patience
+    PATIENCE = 100  # early stopping patience
 
+    from tensorflow.python import debug as tf_debug
+    import keras.backend as K
+
+    sess = K.get_session()
+    sess = tf_debug.LocalCLIDebugWrapperSession(sess)
+    K.set_session(sess)
     # Get data
     X, A, y = load_data(path=PATH,dataset=DATASET, prefix=PREFIX)
-    y_train, y_val, y_test, idx_train, idx_val, idx_test, train_mask = get_splits(y,DATASET)
+    y_train, y_val, y_test, idx_train, idx_val, idx_test, train_mask = get_splits(y,"")
 
-    pdb.set_trace()
+    #pdb.set_trace()
     # Normalize X
     X /= X.sum(1).reshape(-1, 1)
     if FILTER == 'localpool':
@@ -72,12 +97,13 @@ def main():
     preds = None
     best_val_loss = 99999
 
+    dump_checkpoints()
+    checkpoint = ModelCheckpoint(monitor='val_acc', filepath='checkpoints/model_gcn.txt',save_best_only=False) 
     # Fit
     for epoch in range(1, NB_EPOCH+1):
 
         # Log wall-clock time
         t = time.time()
-
         #pdb.set_trace()
         # Single training iteration (we mask nodes without labels for loss calculation)
         model.fit(graph, y_train, sample_weight=train_mask,
@@ -95,6 +121,12 @@ def main():
               "val_loss= {:.4f}".format(train_val_loss[1]),
               "val_acc= {:.4f}".format(train_val_acc[1]),
               "time= {:.4f}".format(time.time() - t))
+        #print(len(graph))
+        #X = graph[0]
+        #print(X.shape)
+        #a = get_activations(model, graph, print_shape_only=True)  # with just one sample.
+        #display_activations(a)
+
 
         # Early stopping
         if train_val_loss[1] < best_val_loss:
