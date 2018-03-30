@@ -46,10 +46,12 @@ def main():
 
     from tensorflow.python import debug as tf_debug
     import keras.backend as K
-
-    sess = K.get_session()
-    sess = tf_debug.LocalCLIDebugWrapperSession(sess)
-    K.set_session(sess)
+    debug = False
+    debug = True
+    if debug:
+        sess = K.get_session()
+        sess = tf_debug.LocalCLIDebugWrapperSession(sess)
+        K.set_session(sess)
     # Get data
     X, A, y = load_data(path=PATH,dataset=DATASET, prefix=PREFIX)
     y_train, y_val, y_test, idx_train, idx_val, idx_test, train_mask = get_splits(y,DATASET)
