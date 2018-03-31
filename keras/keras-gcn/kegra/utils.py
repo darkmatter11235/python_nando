@@ -85,9 +85,12 @@ def sample_mask(idx, l):
 
 def get_splits(y, dataset=""):
     if dataset == 'sch2graph':
-        idx_train = range(100)
-        idx_val = range(101, 200)
-        idx_test = range(201, 290)
+        size = 301
+        x = range(size)
+        np.random.shuffle(x)
+        idx_train = x[:200]
+        idx_val = x[201:250]
+        idx_test = x[251:]
     elif dataset == 'cora':
         idx_train = range(140)
         idx_val = range(200, 500)

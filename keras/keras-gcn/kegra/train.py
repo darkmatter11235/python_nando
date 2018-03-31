@@ -87,7 +87,7 @@ def main(debug=False, dataset='sch2graph'):
     # NOTE: We pass arguments for graph convolutional layers as a list of tensors.
     # This is somewhat hacky, more elegant options would require rewriting the Layer base class.
     H = Dropout(0.5)(X_in)
-    H = GraphConvolution(16, support, activation='relu', kernel_regularizer=l2(5e-4))([H]+G)
+    H = GraphConvolution(20, support, activation='relu', kernel_regularizer=l2(5e-4))([H]+G)
     H = Dropout(0.5)(H)
     Y = GraphConvolution(y.shape[1], support, activation='softmax')([H]+G)
 
@@ -115,7 +115,7 @@ def main(debug=False, dataset='sch2graph'):
         # Predict on full dataset
         preds = model.predict(graph, batch_size=A.shape[0])
 
-        print(preds)
+        #print(preds)
         # Train / validation scores
         train_val_loss, train_val_acc = evaluate_preds(preds, [y_train, y_val],
                                                        [idx_train, idx_val])
@@ -128,8 +128,6 @@ def main(debug=False, dataset='sch2graph'):
         #print(len(graph))
         #X = graph[0]
         #print(X.shape)
-        a = get_activations(model, graph, print_shape_only=False)  # with just one sample.
-        display_activations(a)
 
 
         # Early stopping
@@ -144,6 +142,8 @@ def main(debug=False, dataset='sch2graph'):
 
     # Testing
     test_loss, test_acc = evaluate_preds(preds, [y_test], [idx_test])
+    #a = get_activations(model, graph, print_shape_only=True)  # with just one sample.
+    #display_activations(a)
     print("Test set results:",
           "loss= {:.4f}".format(test_loss[0]),
           "accuracy= {:.4f}".format(test_acc[0]))
