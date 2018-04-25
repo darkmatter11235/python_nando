@@ -18,6 +18,8 @@ dataset = np.asarray(dataset).astype('float32')
 num_words = dataset.shape[0]
 num_test = int(num_words*0.25)
 num_train = num_words-num_test
+X = dataset[:,:-6]
+Y = dataset[:,-6:]
 train_data = dataset[0:num_train,:-6]
 train_labels = dataset[0:num_train,-6:]
 print train_data[0:5]
@@ -43,16 +45,23 @@ print train_labels.shape
 
 input_dim = train_data.shape[1]
 print input_dim
-h1_dim = 64
-h2_dim = 32
-h3_dim = 64
+h1_dim = 128
+h2_dim = 128
+h3_dim = 256
 out_dim = 6
-num_epochs = 2000
-
+num_epochs = 10000
+use_dropout = False
+dropout_rate = 0.2
 network = models.Sequential()
 network.add(layers.Dense(h1_dim, activation='relu', input_shape=(input_dim,)))
+if use_dropout == True:
+    network.add(layers.Dropout(dropout_rate))
 network.add(layers.Dense(h2_dim, activation='relu'))
+if use_dropout == True:
+    network.add(layers.Dropout(dropout_rate))
 network.add(layers.Dense(h3_dim, activation='relu'))
+if use_dropout == True:
+    network.add(layers.Dropout(dropout_rate))
 network.add(layers.Dense(out_dim, activation='sigmoid'))
 
 #network.compile(optimizer=optimizers.RMSprop(lr=0.005),
@@ -63,11 +72,14 @@ network.compile(optimizer=optimizers.Adam(lr=0.001, beta_1=0.9, beta_2=0.999, ep
                 loss=losses.binary_crossentropy,
                 metrics=[metrics.binary_accuracy])
 
-cache = network.fit(train_data, train_labels,
-            epochs = num_epochs,
-            batch_size = 512,
-            validation_data = (test_data, test_labels))
+#cache = network.fit(train_data, train_labels,
+#            epochs = num_epochs,
+#            batch_size = 512,
+#            validation_data = (test_data, test_labels))
 
+cache = network.fit(X, Y, validation_split=0.33,
+            epochs = num_epochs,
+            batch_size = 512)
 history = cache.history
 
 for key, value in history.iteritems():
