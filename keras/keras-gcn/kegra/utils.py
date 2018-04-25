@@ -35,11 +35,13 @@ def load_data(path="data/cora/", dataset="cora", prefix=""):
         adj = adj + adj.T.multiply(adj.T > adj) - adj.multiply(adj.T > adj)
 
     elif dataset == "sch2graph":
-        idx_features_labels = np.genfromtxt("{}{}/{}_device_index.txt".format(path, dataset,prefix), dtype=np.float32)
+        #idx_features_labels = np.genfromtxt("{}{}/{}_device_index.txt".format(path, dataset,prefix), dtype=np.float32)
+        idx_features_labels = np.genfromtxt("{}{}/{}_device_index.txt".format(path, dataset,prefix), dtype=np.dtype(str))
         #features = sp.csr_matrix(idx_features_labels[:,2:-1], dtype=np.float32)
         features = sp.csr_matrix(encode_onehot(idx_features_labels[:,1]), dtype=np.int32)
         #labels = encode_onehot(idx_features_labels[:,2]+idx_features_labels[:,3]+idx_features_labels[:,4])
-        labels = encode_onehot(idx_features_labels[:,-2])
+        print(idx_features_labels[:,-1])
+        labels = encode_onehot(idx_features_labels[:,-1])
         ## build graph
         idx = np.array(idx_features_labels[:, 1], dtype=np.int32)
         idx_map = {j: i for i, j in enumerate(idx)}

@@ -38,6 +38,7 @@ def main(debug=False, dataset='sch2graph'):
     if DATASET == 'sch2graph':
         PATH = 'data/'
         PREFIX = 'dly_cell'
+        PREFIX = 'mcdlycellbwcb_psd2x'
     else:
         DATASET = 'cora'
         PATH = 'data/cora/'
@@ -87,7 +88,7 @@ def main(debug=False, dataset='sch2graph'):
     # NOTE: We pass arguments for graph convolutional layers as a list of tensors.
     # This is somewhat hacky, more elegant options would require rewriting the Layer base class.
     H = Dropout(0.5)(X_in)
-    H = GraphConvolution(20, support, activation='relu', kernel_regularizer=l2(5e-4))([H]+G)
+    H = GraphConvolution(12, support, activation='relu', kernel_regularizer=l2(5e-4))([H]+G)
     H = Dropout(0.5)(H)
     Y = GraphConvolution(y.shape[1], support, activation='softmax')([H]+G)
 
@@ -142,11 +143,11 @@ def main(debug=False, dataset='sch2graph'):
 
     # Testing
     test_loss, test_acc = evaluate_preds(preds, [y_test], [idx_test])
-    #a = get_activations(model, graph, print_shape_only=True)  # with just one sample.
-    #display_activations(a)
     print("Test set results:",
           "loss= {:.4f}".format(test_loss[0]),
           "accuracy= {:.4f}".format(test_acc[0]))
+    #a = get_activations(model, graph, print_shape_only=True)  # with just one sample.
+    #display_activations(a)
 
 if __name__ == '__main__':
     ap = argparse.ArgumentParser()
