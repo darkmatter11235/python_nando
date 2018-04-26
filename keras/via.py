@@ -18,14 +18,16 @@ dataset = np.asarray(dataset).astype('float32')
 num_words = dataset.shape[0]
 num_test = int(num_words*0.25)
 num_train = num_words-num_test
-X = dataset[:,:-6]
-Y = dataset[:,-6:]
-train_data = dataset[0:num_train,:-6]
-train_labels = dataset[0:num_train,-6:]
-print train_data[0:5]
-print train_labels[0:5]
-test_data = dataset[num_train:,:-6]
-test_labels = dataset[num_train:,-6:]
+print dataset.shape
+y_column = 49
+X = dataset[:,:-4]
+Y = dataset[:,-4:]
+train_data = dataset[0:num_train,:-4]
+train_labels = dataset[0:num_train,-4:]
+#print train_data[0:5]
+#print train_labels[0:5]
+test_data = dataset[num_train:,:-4]
+test_labels = dataset[num_train:,-4:]
 #print dataset.shape
 
 print train_data.shape
@@ -48,7 +50,7 @@ print input_dim
 h1_dim = 128
 h2_dim = 128
 h3_dim = 256
-out_dim = 6
+out_dim = 4
 num_epochs = 10000
 use_dropout = False
 dropout_rate = 0.2
